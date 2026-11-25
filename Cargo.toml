@@ -1,0 +1,18 @@
+[package]
+name = "FireflyMusic"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+web-time = "1.1"
+gpui_platform = { package = "gpui-pre-platform", version = "=0.3.12", features = ["font-kit"] }
+gpui-icons = "=0.7.0"
+gpui-kit = { version = "=0.10.0", default-features = false, features = ["component"] }
+# 原生系统托盘：菜单用 gpui 的 MenuItem + Action，与项目共用 gpui-pre 0.3 类型。
+gpui-tray = { version = "=0.3.0", default-features = false, features = [
+    "gpui-kit",
+    "menu-state",
+] }
+
+[dev-dependencies]
+gpui-kit = { version = "=0.10.0", default-features = false, features = ["component", "test-support"] }

@@ -26,6 +26,8 @@ actions!(
         TrayTogglePlay,
         /// 打开（前置）主面板。
         TrayOpenWindow,
+        /// 打开歌词编辑器窗口。
+        TrayOpenLyricsEditor,
         /// 循环播放开关。
         TrayToggleLoop,
         /// 退出应用。
@@ -63,12 +65,10 @@ fn build_menu(model: &TrayModel) -> Vec<MenuItem> {
         MenuItem::action(model.label(), TrayNoop).disabled(true),
         MenuItem::separator(),
         MenuItem::action("下一曲", TrayNext),
-        MenuItem::action(
-            if model.playing { "暂停" } else { "播放" },
-            TrayTogglePlay,
-        ),
+        MenuItem::action(if model.playing { "暂停" } else { "播放" }, TrayTogglePlay),
         MenuItem::action("上一曲", TrayPrevious),
         MenuItem::action("打开主面板", TrayOpenWindow),
+        MenuItem::action("歌词编辑器", TrayOpenLyricsEditor),
         MenuItem::action("循环播放", TrayToggleLoop).checked(model.looping),
         MenuItem::separator(),
         MenuItem::action("退出", TrayQuit),
@@ -91,7 +91,7 @@ pub fn install(cx: &mut App, player: WeakEntity<Player>) -> gpui_tray::Result<()
     let model: Rc<dyn Fn(&App) -> TrayModel> = Rc::new(move |cx: &App| {
         player
             .upgrade()
-            .map(|player| player.read(cx).tray_model())
+            .map(|player| player.read(cx).tray_model(cx))
             .unwrap_or_default()
     });
 
@@ -136,9 +136,7 @@ pub fn close(cx: &mut App) {
 fn icon() -> gpui_tray::Result<Icon> {
     const SIZE: u32 = 36;
     const RGBA: &[u8] = include_bytes!("../assets/icon/tray-36.rgba");
-    Icon::from_rgba(RGBA, SIZE, SIZE)
-        .scale_factor(2.0)
-        .build()
+    Icon::from_rgba(RGBA, SIZE, SIZE).scale_factor(2.0).build()
 }
 
 /// 托盘图标：构建时嵌进来的裸 RGBA 像素，省掉运行时解码 PNG。
@@ -168,7 +166,8 @@ mod tests {
         assert_eq!(model.label(), "夜航 - Firefly Studio");
     }
 
-    /// 菜单顺序：曲目 / 分隔 / 下一曲 / 播放暂停 / 上一曲 / 打开主面板 / 循环 / 分隔 / 退出。
+    /// 菜单顺序：曲目 / 分隔 / 下一曲 / 播放暂停 / 上一曲 / 打开主面板 /
+    /// 歌词编辑器 / 循环 / 分隔 / 退出。
     #[test]
     fn menu_order_and_state() {
         let model = TrayModel {
@@ -177,7 +176,7 @@ mod tests {
             looping: true,
         };
         let items = build_menu(&model);
-        assert_eq!(items.len(), 9);
+        assert_eq!(items.len(), 10);
 
         // 曲目行禁用，文案为占位
         assert!(matches!(
@@ -203,11 +202,15 @@ mod tests {
             &items[5],
             MenuItem::Action { name, .. } if name.as_ref() == "打开主面板"
         ));
-        // 勾选项
-        assert!(items[6].is_checked());
-        assert!(matches!(items[7], MenuItem::Separator));
         assert!(matches!(
-            &items[8],
+            &items[6],
+            MenuItem::Action { name, .. } if name.as_ref() == "歌词编辑器"
+        ));
+        // 勾选项
+        assert!(items[7].is_checked());
+        assert!(matches!(items[8], MenuItem::Separator));
+        assert!(matches!(
+            &items[9],
             MenuItem::Action { name, .. } if name.as_ref() == "退出"
         ));
     }
@@ -220,6 +223,6 @@ mod tests {
             &items[3],
             MenuItem::Action { name, .. } if name.as_ref() == "播放"
         ));
-        assert!(!items[6].is_checked());
+        assert!(!items[7].is_checked());
     }
 }

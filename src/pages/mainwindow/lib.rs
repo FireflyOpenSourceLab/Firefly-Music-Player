@@ -17,6 +17,7 @@
 pub mod artist;
 pub mod home;
 pub mod library;
+pub mod metadata;
 pub mod myfavorite;
 pub mod mystars;
 pub mod zhuanji;

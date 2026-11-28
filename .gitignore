@@ -1,2 +1,4 @@
 /target
 /.iconwork
+# 设计稿解析用的临时渲染产物
+/.scratch

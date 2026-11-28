@@ -120,11 +120,17 @@ pub fn run<V: Render>(
 /// 这样 `FontWeight` 可以直接命中对应字面，而不是靠合成加粗。
 pub fn bundled_fonts() -> Vec<Cow<'static, [u8]>> {
     vec![
-        Cow::Borrowed(include_bytes!("../../assets/fonts/HarmonyOS_Sans_Regular.ttf")),
-        Cow::Borrowed(include_bytes!("../../assets/fonts/HarmonyOS_Sans_Light.ttf")),
+        Cow::Borrowed(include_bytes!(
+            "../../assets/fonts/HarmonyOS_Sans_Regular.ttf"
+        )),
+        Cow::Borrowed(include_bytes!(
+            "../../assets/fonts/HarmonyOS_Sans_Light.ttf"
+        )),
         Cow::Borrowed(include_bytes!("../../assets/fonts/HarmonyOS_Sans_Bold.ttf")),
         Cow::Borrowed(include_bytes!("../../assets/fonts/HarmonyOS_Sans_Thin.ttf")),
-        Cow::Borrowed(include_bytes!("../../assets/fonts/HarmonyOS_Sans_Black.ttf")),
+        Cow::Borrowed(include_bytes!(
+            "../../assets/fonts/HarmonyOS_Sans_Black.ttf"
+        )),
     ]
 }
 

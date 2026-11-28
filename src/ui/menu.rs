@@ -38,6 +38,7 @@ pub struct MenuItem {
     description: Option<SharedString>,
     trailing: Option<Slot>,
     shortcut: Option<SharedString>,
+    danger: bool,
 }
 impl MenuItem {
     /// Creates an action with a caller-owned ID, unique within this menu tree.
@@ -57,7 +58,13 @@ impl MenuItem {
             description: None,
             trailing: None,
             shortcut: None,
+            danger: false,
         }
+    }
+    /// 标记为危险操作（如删除）：图标与文字改用 `destructive` 色。
+    pub fn danger(mut self, value: bool) -> Self {
+        self.danger = value;
+        self
     }
     /// Shows a 16px Lucide icon in muted color at the row's leading edge.
     pub fn icon(mut self, icon: LucideIcon) -> Self {
@@ -565,6 +572,7 @@ impl Render for MenuState {
                 let entity = cx.entity();
                 let selected = self.highlighted[depth] == Some(index);
                 let submenu = !item.children.is_empty();
+                let danger = item.danger;
                 let role = if submenu {
                     Role::MenuItem
                 } else if item.link {
@@ -632,12 +640,15 @@ impl Render for MenuState {
                                 .items_center()
                                 .child(slot(window, cx)),
                         ),
-                        (None, Some(icon)) => b.child(
-                            lucide(icon)
-                                .flex_shrink_0()
-                                .size(t.space(4.))
-                                .text_color(t.colors.muted_foreground),
-                        ),
+                        (None, Some(icon)) => {
+                            b.child(lucide(icon).flex_shrink_0().size(t.space(4.)).text_color(
+                                if danger {
+                                    t.colors.destructive
+                                } else {
+                                    t.colors.muted_foreground
+                                },
+                            ))
+                        }
                         (None, None) => b,
                     })
                     .child(
@@ -650,6 +661,7 @@ impl Render for MenuState {
                                 div()
                                     .debug_selector(|| "menu-label".into())
                                     .truncate()
+                                    .when(danger, |el| el.text_color(t.colors.destructive))
                                     .child(item.label.clone()),
                             )
                             .when_some(item.description.clone(), |col, description| {

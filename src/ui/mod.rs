@@ -1,5 +1,4 @@
 pub mod app;
-pub mod theme;
 pub mod app_theme;
 pub mod button;
 pub mod dialog;
@@ -9,4 +8,5 @@ pub mod menu;
 pub mod now_playing;
 pub mod scroll_area;
 pub mod sidebar;
+pub mod theme;
 pub mod tooltip;

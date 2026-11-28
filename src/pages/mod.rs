@@ -5,3 +5,5 @@
 
 #[path = "mainwindow/lib.rs"]
 pub mod mainwindow;
+
+pub mod lyricseditor;
